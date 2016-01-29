@@ -21,6 +21,11 @@ class User implements JsonSerializable {
      **/
     private $accessLevelId;
     /**
+     * allows activation of a new user account
+     * @var string for activation
+     **/
+    private $activation;
+    /**
      * email for the user
      * @var string for $email
      **/
@@ -69,12 +74,13 @@ class User implements JsonSerializable {
      * @param $newProfilePath
      * @param $newSalt
      **/
-    public function __construct($newUserId, $newAccessLevelId, $newEmail, $newFirstName, $newHash, $newLastName,
+    public function __construct($newUserId, $newAccessLevelId, $newActivation, $newEmail, $newFirstName, $newHash, $newLastName,
                                 $newPhone, $newProfilePath, $newSalt)
     {
         try {
             $this->setUserId($newUserId);
             $this->setAccessLevelId($newAccessLevelId);
+            $this->setActivation($newActivation);
             $this->setEmail($newEmail);
             $this->setFirstName($newFirstName);
             $this->setHash($newHash);
@@ -134,9 +140,12 @@ class User implements JsonSerializable {
     }
 
     /**
-     * Mutator method for accessLevelId
-     */
-    public function setAccessLevelId() {
+     * Mutator method for access levelId
+     *
+     * @param $newAccessLevelId int
+     * @throws InvalidArgumentException if access level is invalid
+     **/
+    public function setAccessLevelId($newAccessLevelId) {
         // verify access level is integer
         $newAccessLevelId = filter_var($newAccessLevelId, FILTER_VALIDATE_INT);
         if(empty($newAccessLevelId) === true) {
@@ -145,6 +154,32 @@ class User implements JsonSerializable {
         $this->accessLevelId = $newAccessLevelId;
     }
 
+    /**
+     * @return string
+     **/
+    public function getActivation() {
+        return ($this->activation);
+    }
+
+    /**
+     * @param $newActivation
+     **/
+    public function setActivation($newActivation) {
+        if($newActivation === null){
+            $this->activation = null;
+            return;
+        }
+        // verify salt is exactly string of 16
+        if((ctype_xdigit($newActivation)) === false) {
+            if(empty($newActivation) === true) {
+                throw new InvalidArgumentException ("activation invalid");
+            }
+            if(strlen($newActivation) !== 16) {
+                throw (new RangeException ("Activation not valid"));
+            }
+        }
+        $this->activation = $newActivation;
+    }
 
     /**
      * accessor method for email
@@ -360,12 +395,13 @@ class User implements JsonSerializable {
         }
         //create query template
         $query
-            = "INSERT INTO user(accessLevelId, email, firstName, hash, lastName, phone, profilePath, salt)
-		VALUES (:accessLevel, :email, :firstName, :hash, :lastName, :phone, :profilePath, :salt)";
+            = "INSERT INTO user(accessLevelId, activation, email, firstName, hash, lastName, phone, profilePath, salt)
+		VALUES (:accessLevel, :activation, :email, :firstName, :hash, :lastName, :phone, :profilePath, :salt)";
         $statement = $pdo->prepare($query);
 
         // bind the variables to the place holders in the template
-        $parameters = array("accessLevelId" => $this->accessLevel, "email" => $this->email,  "firstName" => $this->firstName,
+        $parameters = array("accessLevelId" => $this->accessLevelId, "activation" => $this->activation, "email" => $this->email,
+            "firstName" => $this->firstName,
             "hash" => $this->hash, "lastName" => $this->lastName, "phone" => $this->phone, "profilePath" => $this->profilePath,
             "salt" => $this->salt);
         $statement->execute($parameters);
@@ -401,17 +437,18 @@ class User implements JsonSerializable {
      * Update PDO to update user class
      * @param PDO $pdo pointer to PDO connection, by reference
      **/
-    public function update(PDO &$pdo) {
+    public function update(PDO $pdo) {
 
         // create query template
-        $query = "UPDATE user SET accessLevelId = :accesslevel, email = :email, firstName = :firstName, hash = :hash, lastName = :lastName,
+        $query = "UPDATE user SET accessLevelId = :accessLevelId, activation = :activation, email = :email,
+        firstName = :firstName, hash = :hash, lastName = :lastName,
  		phone = :phone, profilePath = :profilePath, salt = :salt WHERE userId = :userId";
         $statement = $pdo->prepare($query);
 
         // bind the member variables
-        $parameters = array("accessLevel" => $this->accessLevelId, "email" => $this->email, "firstName" => $this->firstName, "hash" => $this->hash,
-            "lastName" => $this->lastName, "phone" => $this->phone, "profilePath" => $this->profilePath, "salt" => $this->salt,
-            "userId" => $this->userId);
+        $parameters = array("accessLevel" => $this->accessLevelId, "activation" => $this->activation, "email" => $this->email,
+            "firstName" => $this->firstName, "hash" => $this->hash, "lastName" => $this->lastName, "phone" => $this->phone,
+            "profilePath" => $this->profilePath, "salt" => $this->salt, "userId" => $this->userId);
         $statement->execute($parameters);
     }
 
@@ -422,7 +459,7 @@ class User implements JsonSerializable {
      * @param int for unique userId $userId
      * @return mixed|User
      **/
-    public static function getUserByUserId(PDO &$pdo, $userId) {
+    public static function getUserByUserId(PDO $pdo, $userId) {
         // sanitize the userId before searching
         $userId = filter_var($userId, FILTER_VALIDATE_INT);
         if($userId === false) {
@@ -447,8 +484,9 @@ class User implements JsonSerializable {
             $statement->setFetchMode(PDO::FETCH_ASSOC);
             $row = $statement->fetch();
             if($row !== false) {
-                $user = new User ($row["userId"], $row["accessLevelId"], $row["email"], $row["firstName"], $row["hash"],
-                    $row["lastName"], $row["phone"], $row["profilePath"], $row["salt"]);
+                $user = new User ($row["userId"], $row["accessLevelId"], $row["activation"], $row["email"],
+                    $row["firstName"], $row["hash"], $row["lastName"], $row["phone"], $row["profilePath"],
+                    $row["salt"]);
             }
         } catch(Exception $exception) {
             // if the row couldn't be converted, rethrow it
@@ -456,6 +494,7 @@ class User implements JsonSerializable {
         }
         return ($user);
     }
+
 
     /**
      * get user by email
@@ -471,7 +510,7 @@ class User implements JsonSerializable {
             throw(new PDOException(""));
         }
         // create query template
-        $query = "SELECT userId, accessLevelId, email, firstName, hash, lastName, phone, profilePath, salt
+        $query = "SELECT userId, accessLevelId, activation, email, firstName, hash, lastName, phone, profilePath, salt
         FROM user WHERE email = :email";
         $statement = $pdo->prepare($query);
 
@@ -485,8 +524,8 @@ class User implements JsonSerializable {
             $statement->setFetchMode(PDO::FETCH_ASSOC);
             $row = $statement->fetch();
             if($row !== false) {
-                $user = new User ($row["userId"], $row["accessLevelId"], $row["email"], $row["firstName"], $row["hash"],
-                    $row["lastName"], $row["phone"], $row["profilePath"], $row["salt"]);
+                $user = new User ($row["userId"], $row["accessLevelId"], $row["activation"], $row["email"],
+                    $row["firstName"], $row["hash"], $row["lastName"], $row["phone"], $row["profilePath"], $row["salt"]);
             }
         } catch(Exception $exception) {
             // if the row couldn't be converted, rethrow it
@@ -504,7 +543,7 @@ class User implements JsonSerializable {
     public static function getAllUsers(PDO &$pdo) {
 
         // create query template
-        $query = "SELECT userId, accessLevelId, email, firstName, hash, lastName, phone,
+        $query = "SELECT userId, accessLevelId, activation, email, firstName, hash, lastName, phone,
 				profilePath, salt FROM user";
         $statement = $pdo->prepare($query);
 
@@ -514,7 +553,7 @@ class User implements JsonSerializable {
             $statement->setFetchMode(PDO::FETCH_ASSOC);
             $row = $statement->fetch();
             if($row !== false) {
-                $user = new User ($row["userId"], $row["accessLevelId"], $row["email"], $row["firstName"], $row["hash"],
+                $user = new User ($row["userId"], $row["accessLevelId"], $row["activation"], $row["email"], $row["firstName"], $row["hash"],
                     $row["lastName"], $row["phone"], $row["profilePath"], $row["salt"]);
             }
         } catch(Exception $exception) {

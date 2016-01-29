@@ -10,6 +10,7 @@ CREATE TABLE accessLevel (
 CREATE TABLE user (
     userId INT UNSIGNED AUTO_INCREMENT NOT NULL,
     accessLevelId TINYINT UNSIGNED NOT NULL,
+    activation CHAR(16),
     email VARCHAR(128) NOT NULL,
     firstName VARCHAR(32) NOT NULL,
     hash CHAR(128) NOT NULL,

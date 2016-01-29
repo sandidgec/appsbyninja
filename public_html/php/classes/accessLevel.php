@@ -6,7 +6,13 @@
  *
  * @author Charles Sandidge sandidgec@gmail.com
  **/
-class accessLevel implements JsonSerializable {
+class accessLevel extends SplEnum implements JsonSerializable {
+        const __default = self::Viewer;
+
+        const Viewer = 1;
+        const Admin = 2;
+        const PowerUser = 3;
+
 
 
         /**
@@ -22,7 +28,7 @@ class accessLevel implements JsonSerializable {
 
 
     /**
-     * accessLevel constructor.
+     * accessLevel constructor
      * @param $newAccessLevelId
      * @param $newDescription
      **/
@@ -30,7 +36,7 @@ class accessLevel implements JsonSerializable {
 
         {
             try {
-                $this->setAccesslevelId($newAccessLevelId);
+                $this->setAccessLevelId($newAccessLevelId);
                 $this->setDescription($newDescription);
             } catch (InvalidArgumentException $invalidArgument) {
                 //rethrow the exception to the caller
@@ -55,7 +61,7 @@ class accessLevel implements JsonSerializable {
     /**
      * mutator method for the accessLevelId
      *
-     * @param intvalue to represent a users accessLevelId
+     * @param int value to represent a users accessLevelId
      * @throws InvalidArgumentException for invalid content
      **/
     public function setUserId($newAccessLevelId) {
@@ -98,13 +104,18 @@ class accessLevel implements JsonSerializable {
         $this->description = $newDescription;
     }
 
+    public function JsonSerialize() {
+        $fields = get_object_vars($this);
+        return ($fields);
+    }
+
     /**
      * Inserts User into mySQL
      *
      * Inserts this userId into mySQL in intervals
      * @param PDO $pdo connection to
      **/
-    public function insert(PDO &$pdo) {
+    public function insert(PDO $pdo) {
 
         //create query template
         $query
