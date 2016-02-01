@@ -110,9 +110,9 @@ class accessLevel extends SplEnum implements JsonSerializable {
     }
 
     /**
-     * Inserts User into mySQL
+     * Inserts Access Level into mySQL
      *
-     * Inserts this userId into mySQL in intervals
+     * Inserts this accessLevelId into mySQL
      * @param PDO $pdo connection to
      **/
     public function insert(PDO $pdo) {
@@ -129,6 +129,36 @@ class accessLevel extends SplEnum implements JsonSerializable {
 
     }
 
+    /**
+     * Deletes access level from mySQL
+     *
+     * @param PDO $pdo connection
+     **/
+    public function delete(PDO $pdo) {
 
+        //create query template
+        $query = "DELETE FROM accessLevel WHERE accessLevelId = :accessLevelId";
+        $statement = $pdo->prepare($query);
+
+        $parameters = array("accessLevelId" => $this->accessLevelId);
+        $statement->execute($parameters);
+    }
+
+    /**
+     * updates Access Level in mySQL
+     *
+     * Update PDO to update accessLevel class
+     * @param PDO $pdo pointer to PDO connection, by reference
+     **/
+    public function update(PDO $pdo) {
+
+        // create query template
+        $query = "UPDATE accessLevel SET description = :description WHERE accessLevelId = :accessLevelId";
+        $statement = $pdo->prepare($query);
+
+        // bind the member variables
+        $parameters = array("description" => $this->description,  "accessLevelId" => $this->accessLevelId);
+        $statement->execute($parameters);
+    }
 }
 

@@ -1,21 +1,11 @@
 <?php
-/**
- * Get the relative path.
- * @see https://raw.githubusercontent.com/kingscreations/farm-to-you/master/php/lib/header.php FarmToYou Header
- **/
-//require_once(dirname(dirname(__DIR__)) . "/root-path.php");
-//$CURRENT_DEPTH = substr_count($CURRENT_DIR, "/");
-//$ROOT_DEPTH = substr_count($ROOT_PATH, "/");
-//$DEPTH_DIFFERENCE = $CURRENT_DEPTH - $ROOT_DEPTH;
-//$PREFIX = str_repeat("../", $DEPTH_DIFFERENCE);
-
-//require_once($PREFIX . "php/lib/xsrf.php");
-if(session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-//setXsrfCookie();
-
+require_once (dirname(dirname(__DIR__)) . "/root-path.php");
+$CURRENT_DEPTH = substr_count($CURRENT_DIR, "/");
+$ROOT_DEPTH = substr_count($ROOT_PATH, "/");
+$DEPTH_DIFFERENCE = $CURRENT_DEPTH - $ROOT_DEPTH;
+$PREFIX = str_repeat("../", $DEPTH_DIFFERENCE);
 ?>
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -52,7 +42,6 @@ if(session_status() !== PHP_SESSION_ACTIVE) {
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="../../../css/sticky-footer.css">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -76,10 +65,9 @@ if(session_status() !== PHP_SESSION_ACTIVE) {
             integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ=="
             crossorigin="anonymous"></script>
 
-    <!-- Custom JS -->
-    <script src="<?php echo $PREFIX; ?>js/text-animation.js"></script>
+    <!-- Angular CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
 
-    <title><?php echo $PAGE_TITLE ?></title>
 </head>
 
 <body class="sfooter">
