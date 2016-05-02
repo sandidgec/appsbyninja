@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <?php require_once("php/lib/headutils.php");?>
+    <?php include_once("analyticstracking.php") ?>
 </head>
 
 <body>
@@ -16,7 +17,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Project name</a>
+            <a class="navbar-brand" href="#">Cultivating Coders Student Server</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
@@ -29,7 +30,10 @@
 </nav>
 
 <div class="container">
+<xmp>
 
+    <h1>Example</h1>
+</xmp>
 
 
 </div><!-- /.container -->

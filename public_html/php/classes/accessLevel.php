@@ -101,7 +101,6 @@ class accessLevel extends SplEnum implements JsonSerializable {
         if(strlen($newDescription) > 32) {
             throw (new RangeException ("description too large"));
         }
-        $this->description = $newDescription;
     }
 
     public function JsonSerialize() {
