@@ -8,18 +8,18 @@ CREATE TABLE accessLevel (
 );
 
 CREATE TABLE user (
-    userId INT UNSIGNED AUTO_INCREMENT NOT NULL,
-    accessLevelId TINYINT UNSIGNED NOT NULL,
-    activation CHAR(16),
-    email VARCHAR(128) NOT NULL,
-    firstName VARCHAR(32) NOT NULL,
-    hash CHAR(128) NOT NULL,
-    lastName VARCHAR(32) NOT NULL,
-    phone VARCHAR(32) NOT NULL,
-    profilePath VARCHAR(255) NOT NULL,
-    salt CHAR(64) NOT NULL,
-    PRIMARY KEY(userId),
-    FOREIGN KEY(accessLevelId) REFERENCES accessLevel(accessLevelId)
+  userId INT UNSIGNED AUTO_INCREMENT NOT NULL,
+  accessLevelId TINYINT UNSIGNED NOT NULL,
+  activation CHAR(16),
+  email VARCHAR(128) NOT NULL,
+  firstName VARCHAR(32) NOT NULL,
+  hash CHAR(128) NOT NULL,
+  lastName VARCHAR(32) NOT NULL,
+  phone VARCHAR(32) NOT NULL,
+  profilePath VARCHAR(255) NOT NULL,
+  salt CHAR(64) NOT NULL,
+  PRIMARY KEY(userId),
+  FOREIGN KEY(accessLevelId) REFERENCES accessLevel(accessLevelId)
 
 );
 
